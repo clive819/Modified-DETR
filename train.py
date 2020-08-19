@@ -70,7 +70,7 @@ def main(args):
 
             # MARK: - print & save training details
             print(f'Epoch {epoch} | {batch + 1} / {batches}')
-            logMetrics({k: v for k, v in metrics.items() if 'aux' not in k})
+            logMetrics(metrics)
             logger.step(metrics, epoch, batch)
 
             # MARK: - backpropagation

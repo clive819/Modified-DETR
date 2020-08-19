@@ -33,7 +33,7 @@ class SetCriterion(nn.Module):
             'boxes': a tensor of shape [numObjects, 4] that stores the ground-truth bounding boxes of objects
             represented as [centerX, centerY, w, h]
 
-        :return: a dictionary containing classification loss, bbox loss, and gIoU loss for the final output layer
+        :return: a dictionary containing classification loss, bbox loss, and gIoU loss
         """
         ids = self.matcher(x, y)
         idx = self.getPermutationIdx(ids)

@@ -40,6 +40,21 @@ class DETR(nn.Module):
         self.bboxEmbed = MLP(args.hiddenDims, args.hiddenDims, 4, 3)
 
     def forward(self, x: Tensor) -> Dict[str, Union[Tensor, List[Dict[str, Tensor]]]]:
+        """
+        :param x: tensor of shape [batchSize, 3, imageHeight, imageWidth].
+
+        :return: a dictionary with the following elements:
+            - class: the classification results for all queries with shape [batchSize, numQuery, numClass + 1].
+                     +1 stands for no object class.
+            - bbox: the normalized bounding box for all queries with shape [batchSize, numQuery, 4],
+                    represented as [centerX, centerY, width, height].
+
+        mask: provides specified elements in the key to be ignored by the attention.
+              the positions with the value of True will be ignored
+              while the position with the value of False will be unchanged.
+              Since I am only training with images of the same shape, the mask should be all False.
+              Modify the mask generation method if you would like to enable training with arbitrary shape.
+        """
         features, (pos, mask) = self.backbone(x)
         features = self.reshape(features)
 

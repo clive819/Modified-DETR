@@ -28,7 +28,7 @@ def baseParser() -> ArgumentParser:
     parser.add_argument('--dimFeedForward', default=1024, type=int)
     parser.add_argument('--dropout', default=.1, type=float)
     parser.add_argument('--numQuery', default=1, type=int)
-    parser.add_argument('--numClass', default=6, type=int)
+    parser.add_argument('--numClass', default=8, type=int)
 
     # MARK: - dataset
     parser.add_argument('--targetHeight', default=288, type=int)

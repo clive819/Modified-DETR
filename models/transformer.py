@@ -24,6 +24,18 @@ class Transformer(nn.Module):
                 nn.init.xavier_uniform_(p)
 
     def forward(self, src: Tensor, mask: Tensor, query: Tensor, pos: Tensor) -> Tensor:
+        """
+        :param src: tensor of shape [batchSize, hiddenDims, imageHeight // 32, imageWidth // 32]
+
+        :param mask: tensor of shape [batchSize, imageHeight // 32, imageWidth // 32]
+                     Please refer to detr.py for more detailed description.
+
+        :param query: object queries, tensor of shape [numQuery, hiddenDims].
+
+        :param pos: positional encoding, the same shape as src.
+
+        :return: tensor of shape [batchSize, numQuery * numDecoderLayer, hiddenDims]
+        """
         N = src.shape[0]
 
         src = src.flatten(2).permute(2, 0, 1)
