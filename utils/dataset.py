@@ -12,6 +12,83 @@ from torch.utils.data.dataset import Dataset
 import utils.transforms as T
 
 
+class MangoDataset(Dataset):
+    def __init__(self, annFile: str, imageDir: str, targetHeight: int, targetWidth: int, numClass: int,
+                 train: bool = True):
+        self.annotations = {}
+        self.table = {}
+        self.imageDir = imageDir
+        self.numClass = numClass
+
+        with open(annFile, 'r', encoding='utf-8-sig') as f:
+            for line in f.readlines():
+                arr = line.rstrip().split(',')
+                ans = []
+
+                for idx in range(1, len(arr), 5):
+                    tlx, tly, w, h, c = arr[idx:idx + 5]
+                    tlx, tly, w, h = list(map(float, (tlx, tly, w, h)))
+
+                    if tlx:
+                        if c not in self.table:
+                            self.table[c] = len(self.table)
+
+                        cx = int(tlx + w / 2)
+                        cy = int(tly + h / 2)
+                        c = self.table[c]
+
+                        ans.append(list(map(int, (cx, cy, w, h, c))))
+
+                self.annotations[arr[0]] = ans
+
+        self.names = list(self.annotations)
+
+        with open('table.txt', 'w') as f:
+            f.write(str(self.table))
+            print(self.table)
+
+        if train:
+            self.transforms = T.Compose([
+                T.RandomOrder([
+                    T.RandomHorizontalFlip(),
+                    T.RandomVerticalFlip(),
+                    T.RandomSizeCrop(numClass)
+                ]),
+                T.Resize((targetHeight, targetWidth)),
+                T.ColorJitter(brightness=.2, contrast=0, saturation=0, hue=0),
+                T.Normalize()
+            ])
+        else:
+            self.transforms = T.Compose([
+                T.Resize((targetHeight, targetWidth)),
+                T.Normalize()
+            ])
+
+    def __len__(self):
+        return len(self.names)
+
+    def __getitem__(self, idx):
+        imgName = self.names[idx]
+        imgPath = os.path.join(self.imageDir, imgName)
+
+        image = Image.open(imgPath).convert('RGB')
+        annotations = np.array(self.annotations[imgName])
+
+        if len(annotations) == 0:
+            targets = {
+                'boxes': torch.zeros(1, 4, dtype=torch.float32),
+                'labels': torch.as_tensor([self.numClass], dtype=torch.int64),
+            }
+        else:
+            targets = {
+                'boxes': torch.as_tensor(annotations[..., :-1], dtype=torch.float32),
+                'labels': torch.as_tensor(annotations[..., -1], dtype=torch.int64),
+            }
+
+        image, targets = self.transforms(image, targets)
+        return image, targets
+
+
 class YOLODataset(Dataset):
     def __init__(self, root: str, targetHeight: int, targetWidth: int, numClass: int, train: bool = True):
         """

@@ -8,7 +8,7 @@ from torch.optim.lr_scheduler import StepLR
 from torch.utils.data.dataloader import DataLoader
 
 from models import DETR, SetCriterion
-from utils.dataset import YOLODataset, collateFunction
+from utils.dataset import MangoDataset, collateFunction
 from utils.misc import baseParser, MetricsLogger, saveArguments, logMetrics
 
 
@@ -22,7 +22,7 @@ def main(args):
         os.mkdir(args.outputDir)
 
     # load data
-    dataset = YOLODataset(args.dataDir, args.targetHeight, args.targetWidth, args.numClass)
+    dataset = MangoDataset(args.annFile, args.dataDir, args.targetHeight, args.targetWidth, args.numClass)
     dataLoader = DataLoader(dataset, batch_size=args.batchSize, shuffle=True, collate_fn=collateFunction,
                             pin_memory=True, num_workers=args.numWorkers)
 
@@ -107,10 +107,10 @@ if __name__ == '__main__':
     # MARK: - training config
     parser.add_argument('--lr', default=1e-4, type=float)
     parser.add_argument('--lrBackbone', default=1e-4, type=float)
-    parser.add_argument('--batchSize', default=32, type=int)
+    parser.add_argument('--batchSize', default=8, type=int)
     parser.add_argument('--weightDecay', default=1e-4, type=float)
-    parser.add_argument('--epochs', default=30000, type=int)
-    parser.add_argument('--lrDrop', default=20000, type=int)
+    parser.add_argument('--epochs', default=1500, type=int)
+    parser.add_argument('--lrDrop', default=1000, type=int)
     parser.add_argument('--clipMaxNorm', default=.1, type=float)
 
     # MARK: - loss
@@ -120,11 +120,12 @@ if __name__ == '__main__':
     parser.add_argument('--eosCost', default=.1, type=float)
 
     # MARK: - dataset
-    parser.add_argument('--dataDir', default='/home/clive819/toy', type=str)
+    parser.add_argument('--dataDir', default='/kaggle/input/manmangogo/Train', type=str)
+    parser.add_argument('--annFile', default='/kaggle/input/manmangogo/train.csv', type=str)
 
     # MARK: - miscellaneous
     parser.add_argument('--outputDir', default='./checkpoint', type=str)
-    parser.add_argument('--taskName', default='toy', type=str)
-    parser.add_argument('--numWorkers', default=16, type=int)
+    parser.add_argument('--taskName', default='mango', type=str)
+    parser.add_argument('--numWorkers', default=8, type=int)
 
     main(parser.parse_args())

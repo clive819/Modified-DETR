@@ -16,23 +16,23 @@ def baseParser() -> ArgumentParser:
 
     # MARK: - model parameters
     # backbone
-    parser.add_argument('--numGroups', default=4, type=int)
+    parser.add_argument('--numGroups', default=8, type=int)
     parser.add_argument('--growthRate', default=32, type=int)
-    parser.add_argument('--numBlocks', default=[3, 3, 3, 3], type=list)
+    parser.add_argument('--numBlocks', default=[6, 12, 24, 16], type=list)
 
     # transformer
-    parser.add_argument('--hiddenDims', default=256, type=int)
-    parser.add_argument('--numHead', default=4, type=int)
-    parser.add_argument('--numEncoderLayer', default=3, type=int)
-    parser.add_argument('--numDecoderLayer', default=3, type=int)
-    parser.add_argument('--dimFeedForward', default=1024, type=int)
+    parser.add_argument('--hiddenDims', default=512, type=int)
+    parser.add_argument('--numHead', default=8, type=int)
+    parser.add_argument('--numEncoderLayer', default=6, type=int)
+    parser.add_argument('--numDecoderLayer', default=6, type=int)
+    parser.add_argument('--dimFeedForward', default=2048, type=int)
     parser.add_argument('--dropout', default=.1, type=float)
-    parser.add_argument('--numQuery', default=1, type=int)
-    parser.add_argument('--numClass', default=8, type=int)
+    parser.add_argument('--numQuery', default=5, type=int)
+    parser.add_argument('--numClass', default=5, type=int)
 
     # MARK: - dataset
-    parser.add_argument('--targetHeight', default=288, type=int)
-    parser.add_argument('--targetWidth', default=288, type=int)
+    parser.add_argument('--targetHeight', default=608, type=int)
+    parser.add_argument('--targetWidth', default=608, type=int)
 
     # MARK: - miscellaneous
     parser.add_argument('--device', default='cuda' if torch.cuda.is_available() else 'cpu', type=str)
