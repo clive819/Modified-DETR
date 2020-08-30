@@ -48,7 +48,7 @@ class Transformer(nn.Module):
         out = self.decoder(tgt, memory, memoryKeyPaddingMask=mask, pos=pos, queryPos=query).transpose(0, 2)
 
         N, Q, L, _ = out.shape
-        return out.view(N, Q * L, -1)
+        return out.contiguous().view(N, Q * L, -1)
 
 
 class TransformerEncoder(nn.Module):
