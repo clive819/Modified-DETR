@@ -16,7 +16,7 @@ class MangoDataset(Dataset):
     def __init__(self, annFile: str, imageDir: str, targetHeight: int, targetWidth: int, numClass: int,
                  train: bool = True):
         self.annotations = {}
-        self.table = {}
+        self.table = {'不良-機械傷害': 0, '不良-著色不佳': 1, '不良-炭疽病': 2, '不良-乳汁吸附': 3, '不良-黑斑病': 4}
         self.imageDir = imageDir
         self.numClass = numClass
 
