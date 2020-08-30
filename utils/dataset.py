@@ -27,9 +27,9 @@ class MangoDataset(Dataset):
 
                 for idx in range(1, len(arr), 5):
                     tlx, tly, w, h, c = arr[idx:idx + 5]
-                    tlx, tly, w, h = list(map(float, (tlx, tly, w, h)))
 
                     if tlx:
+                        tlx, tly, w, h = list(map(float, (tlx, tly, w, h)))
                         if c not in self.table:
                             self.table[c] = len(self.table)
 
