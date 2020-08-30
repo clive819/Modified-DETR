@@ -85,6 +85,10 @@ class MangoDataset(Dataset):
                 'labels': torch.as_tensor(annotations[..., -1], dtype=torch.int64),
             }
 
+        imgW, imgH = torch.tensor(image.size, dtype=torch.float32)
+        scale = torch.stack([imgW, imgH, imgW, imgH]).unsqueeze(0)
+        targets['boxes'] /= scale
+
         image, targets = self.transforms(image, targets)
         return image, targets
 
