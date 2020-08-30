@@ -33,8 +33,10 @@ class MangoDataset(Dataset):
                         if c not in self.table:
                             self.table[c] = len(self.table)
 
-                        cx = int(tlx + w / 2)
-                        cy = int(tly + h / 2)
+                        cx = (tlx + w / 2) / 1280
+                        cy = (tly + h / 2) / 720
+                        w /= 1280
+                        h /= 720
                         c = self.table[c]
 
                         ans.append(list(map(int, (cx, cy, w, h, c))))
