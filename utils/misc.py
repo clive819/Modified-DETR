@@ -18,7 +18,7 @@ def baseParser() -> ArgumentParser:
     # backbone
     parser.add_argument('--numGroups', default=8, type=int)
     parser.add_argument('--growthRate', default=32, type=int)
-    parser.add_argument('--numBlocks', default=[6, 12, 24, 16], type=list)
+    parser.add_argument('--numBlocks', default=[6] * 4, type=list)
 
     # transformer
     parser.add_argument('--hiddenDims', default=256, type=int)
