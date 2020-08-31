@@ -21,13 +21,13 @@ def baseParser() -> ArgumentParser:
     parser.add_argument('--numBlocks', default=[6, 12, 24, 16], type=list)
 
     # transformer
-    parser.add_argument('--hiddenDims', default=512, type=int)
-    parser.add_argument('--numHead', default=8, type=int)
-    parser.add_argument('--numEncoderLayer', default=6, type=int)
-    parser.add_argument('--numDecoderLayer', default=6, type=int)
-    parser.add_argument('--dimFeedForward', default=2048, type=int)
+    parser.add_argument('--hiddenDims', default=256, type=int)
+    parser.add_argument('--numHead', default=4, type=int)
+    parser.add_argument('--numEncoderLayer', default=3, type=int)
+    parser.add_argument('--numDecoderLayer', default=3, type=int)
+    parser.add_argument('--dimFeedForward', default=1024, type=int)
     parser.add_argument('--dropout', default=.1, type=float)
-    parser.add_argument('--numQuery', default=5, type=int)
+    parser.add_argument('--numQuery', default=10, type=int)
     parser.add_argument('--numClass', default=5, type=int)
 
     # MARK: - dataset
