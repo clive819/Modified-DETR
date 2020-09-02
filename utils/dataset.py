@@ -52,7 +52,7 @@ class MangoDataset(Dataset):
                 T.RandomOrder([
                     T.RandomHorizontalFlip(),
                     T.RandomVerticalFlip(),
-                    T.RandomSizeCrop(numClass)
+                    # T.RandomSizeCrop(numClass)
                 ]),
                 T.Resize((targetHeight, targetWidth)),
                 T.ColorJitter(brightness=.2, contrast=0, saturation=0, hue=0),
