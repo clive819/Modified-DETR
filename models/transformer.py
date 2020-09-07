@@ -45,10 +45,9 @@ class Transformer(nn.Module):
         tgt = torch.zeros_like(query)
 
         memory = self.encoder(src, srcKeyPaddingMask=mask, pos=pos)
-        out = self.decoder(tgt, memory, memoryKeyPaddingMask=mask, pos=pos, queryPos=query).transpose(0, 2)
+        out = self.decoder(tgt, memory, memoryKeyPaddingMask=mask, pos=pos, queryPos=query).transpose(1, 2)
 
-        N, Q, L, _ = out.shape
-        return out.contiguous().view(N, Q * L, -1)
+        return out
 
 
 class TransformerEncoder(nn.Module):

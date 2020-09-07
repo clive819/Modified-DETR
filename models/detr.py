@@ -63,8 +63,9 @@ class DETR(nn.Module):
         outputsClass = self.classEmbed(out)
         outputsCoord = self.bboxEmbed(out).sigmoid()
 
-        return {'class': outputsClass,
-                'bbox': outputsCoord}
+        return {'class': outputsClass[-1],
+                'bbox': outputsCoord[-1],
+                'aux': [{'class': oc, 'bbox': ob} for oc, ob in zip(outputsClass[:-1], outputsCoord[:-1])]}
 
 
 class DETRWrapper(nn.Module):

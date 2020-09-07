@@ -23,6 +23,14 @@ class SetCriterion(nn.Module):
         self.register_buffer('emptyWeight', emptyWeight)
 
     def forward(self, x: Dict[str, Tensor], y: List[Dict[str, Tensor]]) -> Dict[str, Tensor]:
+        ans = self.computeLoss(x, y)
+
+        for i, aux in enumerate(x['aux']):
+            ans.update({f'{k}_aux{i}': v for k, v in self.computeLoss(aux, y).items()})
+
+        return ans
+
+    def computeLoss(self, x: Dict[str, Tensor], y: List[Dict[str, Tensor]]) -> Dict[str, Tensor]:
         """
         :param x: a dictionary containing:
             'class': a tensor of shape [batchSize, numQuery * numDecoderLayer, numClass + 1]

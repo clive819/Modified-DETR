@@ -35,8 +35,8 @@ def main(args):
         print(f'loading pre-trained weights from {args.weight}')
         model.load_state_dict(torch.load(args.weight, map_location=device))
 
-    # multi-GPU training
-    model = torch.nn.DataParallel(model)
+    # # multi-GPU training
+    # model = torch.nn.DataParallel(model)
 
     # separate learning rate
     paramDicts = [
@@ -70,7 +70,7 @@ def main(args):
 
             # MARK: - print & save training details
             print(f'Epoch {epoch} | {batch + 1} / {batches}')
-            logMetrics(metrics)
+            logMetrics({k: v for k, v in metrics.items() if 'aux' not in k})
             logger.step(metrics, epoch, batch)
 
             # MARK: - backpropagation
@@ -120,8 +120,8 @@ if __name__ == '__main__':
     parser.add_argument('--eosCost', default=.1, type=float)
 
     # MARK: - dataset
-    parser.add_argument('--dataDir', default='/kaggle/input/manmangogo/Train', type=str)
-    parser.add_argument('--annFile', default='/kaggle/input/manmangogo/train.csv', type=str)
+    parser.add_argument('--dataDir', default='../manmangogo/Train', type=str)
+    parser.add_argument('--annFile', default='../manmangogo/train.csv', type=str)
 
     # MARK: - miscellaneous
     parser.add_argument('--outputDir', default='./checkpoint', type=str)

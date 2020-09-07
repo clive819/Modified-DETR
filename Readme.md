@@ -15,7 +15,6 @@ python3 train.py --dataDir "path_to_your_training_data" --numClass "number_of_cl
 * add support for YOLO dataset
 * modifiable number of classes
 * add support for negative sample (no object) training
-* each decoder layer connects to prediction heads, which should improve accuracy for small objects. (haven't tested yet)
 
 
 ## Data preparation

@@ -27,7 +27,7 @@ def baseParser() -> ArgumentParser:
     parser.add_argument('--numDecoderLayer', default=3, type=int)
     parser.add_argument('--dimFeedForward', default=1024, type=int)
     parser.add_argument('--dropout', default=.1, type=float)
-    parser.add_argument('--numQuery', default=10, type=int)
+    parser.add_argument('--numQuery', default=30, type=int)
     parser.add_argument('--numClass', default=5, type=int)
 
     # MARK: - dataset
@@ -36,7 +36,7 @@ def baseParser() -> ArgumentParser:
 
     # MARK: - miscellaneous
     parser.add_argument('--device', default='cuda' if torch.cuda.is_available() else 'cpu', type=str)
-    parser.add_argument('--weight', default='', type=str)
+    parser.add_argument('--weight', default='checkpoint/mango.pt', type=str)
     parser.add_argument('--seed', default=1588390, type=int)
 
     return parser
