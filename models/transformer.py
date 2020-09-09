@@ -121,8 +121,8 @@ class TransformerDecoderLayer(nn.Module):
     def __init__(self, hiddenDims: int, numHead: int, dimFeedForward: int, dropout: float):
         super(TransformerDecoderLayer, self).__init__()
 
-        self.attention = nn.MultiheadAttention(hiddenDims, numHead, dropout=dropout)
-        self.multiheadAttention = nn.MultiheadAttention(hiddenDims, numHead, dropout=dropout)
+        self.attention1 = nn.MultiheadAttention(hiddenDims, numHead, dropout=dropout)
+        self.attention2 = nn.MultiheadAttention(hiddenDims, numHead, dropout=dropout)
 
         self.linear1 = nn.Linear(hiddenDims, dimFeedForward)
         self.linear2 = nn.Linear(dimFeedForward, hiddenDims)
@@ -143,11 +143,11 @@ class TransformerDecoderLayer(nn.Module):
                 memoryKeyPaddingMask: Optional[Tensor] = None, pos: Optional[Tensor] = None,
                 queryPos: Optional[Tensor] = None) -> Tensor:
         q = k = withPosEmbed(tgt, queryPos)
-        tgt2 = self.attention(q, k, value=tgt, attn_mask=tgtMask, key_padding_mask=tgtKeyPaddingMask)[0]
+        tgt2 = self.attention1(q, k, value=tgt, attn_mask=tgtMask, key_padding_mask=tgtKeyPaddingMask)[0]
         tgt = tgt + self.dropout1(tgt2)
         tgt = self.norm1(tgt)
-        tgt2 = self.multiheadAttention(query=withPosEmbed(tgt, queryPos), key=withPosEmbed(memory, pos),
-                                       value=memory, attn_mask=memoryMask, key_padding_mask=memoryKeyPaddingMask)[0]
+        tgt2 = self.attention2(query=withPosEmbed(tgt, queryPos), key=withPosEmbed(memory, pos),
+                               value=memory, attn_mask=memoryMask, key_padding_mask=memoryKeyPaddingMask)[0]
         tgt = tgt + self.dropout2(tgt2)
         tgt = self.norm2(tgt)
         tgt2 = self.linear2(self.dropout(self.activation(self.linear1(tgt))))
