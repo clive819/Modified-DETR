@@ -3,13 +3,14 @@ from argparse import ArgumentParser
 
 import numpy as np
 import torch
+from torch.cuda import amp
 from torch.optim import AdamW
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data.dataloader import DataLoader
 
 from models import DETR, SetCriterion
 from utils.dataset import MangoDataset, collateFunction
-from utils.misc import baseParser, MetricsLogger, saveArguments, logMetrics
+from utils.misc import baseParser, MetricsLogger, saveArguments, logMetrics, cast2Float
 
 
 def main(args):
@@ -56,13 +57,19 @@ def main(args):
     model.train()
     criterion.train()
 
+    scaler = amp.GradScaler()
+
     for epoch in range(args.epochs):
         losses = []
         for batch, (x, y) in enumerate(dataLoader):
             x = x.to(device)
             y = [{k: v.to(device) for k, v in t.items()} for t in y]
 
-            out = model(x)
+            with amp.autocast():
+                out = model(x)
+
+            # cast output to float to overcome amp training issue
+            out = cast2Float(out)
             metrics = criterion(out, y)
 
             loss = sum(v for k, v in metrics.items() if 'loss' in k)
@@ -75,10 +82,12 @@ def main(args):
 
             # MARK: - backpropagation
             optimizer.zero_grad()
-            loss.backward()
+            scaler.scale(loss).backward()
             if args.clipMaxNorm > 0:
+                scaler.unscale_(optimizer)
                 torch.nn.utils.clip_grad_norm_(model.parameters(), args.clipMaxNorm)
-            optimizer.step()
+            scaler.step(optimizer)
+            scaler.update()
 
         lrScheduler.step()
         logger.epochEnd(epoch)

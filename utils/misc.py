@@ -113,3 +113,11 @@ def logMetrics(metrics: Dict[str, Tensor]):
     log += ' ] [ '.join([f'{k} = {v.cpu().item():.4f}' for k, v in metrics.items()])
     log += ' ]'
     print(log)
+
+
+def cast2Float(x):
+    if isinstance(x, list):
+        return [cast2Float(y) for y in x]
+    elif isinstance(x, dict):
+        return {k: cast2Float(v) for k, v in x.items()}
+    return x.float()
