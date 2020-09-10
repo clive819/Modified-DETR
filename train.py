@@ -36,8 +36,9 @@ def main(args):
         print(f'loading pre-trained weights from {args.weight}')
         model.load_state_dict(torch.load(args.weight, map_location=device))
 
-    # # multi-GPU training
-    # model = torch.nn.DataParallel(model)
+    # multi-GPU training
+    if args.multi:
+        model = torch.nn.DataParallel(model)
 
     # separate learning rate
     paramDicts = [
@@ -65,11 +66,14 @@ def main(args):
             x = x.to(device)
             y = [{k: v.to(device) for k, v in t.items()} for t in y]
 
-            with amp.autocast():
+            if args.amp:
+                with amp.autocast():
+                    out = model(x)
+                # cast output to float to overcome amp training issue
+                out = cast2Float(out)
+            else:
                 out = model(x)
 
-            # cast output to float to overcome amp training issue
-            out = cast2Float(out)
             metrics = criterion(out, y)
 
             loss = sum(v for k, v in metrics.items() if 'loss' in k)
@@ -82,12 +86,18 @@ def main(args):
 
             # MARK: - backpropagation
             optimizer.zero_grad()
-            scaler.scale(loss).backward()
-            if args.clipMaxNorm > 0:
-                scaler.unscale_(optimizer)
-                torch.nn.utils.clip_grad_norm_(model.parameters(), args.clipMaxNorm)
-            scaler.step(optimizer)
-            scaler.update()
+            if args.amp:
+                scaler.scale(loss).backward()
+                if args.clipMaxNorm > 0:
+                    scaler.unscale_(optimizer)
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), args.clipMaxNorm)
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                if args.clipMaxNorm > 0:
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), args.clipMaxNorm)
+                optimizer.step()
 
         lrScheduler.step()
         logger.epochEnd(epoch)
@@ -114,8 +124,8 @@ if __name__ == '__main__':
     parser = ArgumentParser('python3 train.py', parents=[baseParser()])
 
     # MARK: - training config
-    parser.add_argument('--lr', default=1e-4, type=float)
-    parser.add_argument('--lrBackbone', default=1e-4, type=float)
+    parser.add_argument('--lr', default=1e-5, type=float)
+    parser.add_argument('--lrBackbone', default=1e-5, type=float)
     parser.add_argument('--batchSize', default=8, type=int)
     parser.add_argument('--weightDecay', default=1e-4, type=float)
     parser.add_argument('--epochs', default=1500, type=int)
@@ -136,5 +146,7 @@ if __name__ == '__main__':
     parser.add_argument('--outputDir', default='./checkpoint', type=str)
     parser.add_argument('--taskName', default='mango', type=str)
     parser.add_argument('--numWorkers', default=8, type=int)
+    parser.add_argument('--multi', default=False, type=bool)
+    parser.add_argument('--amp', default=False, type=bool)
 
     main(parser.parse_args())
